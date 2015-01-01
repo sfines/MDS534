@@ -3,12 +3,14 @@ __author__ = 'Steve Fines'
 # Chapter One in Mining the Social Web is all about Twitter
 import twitter
 import json
+import configparser
+
 
 # Twitter's OAuth stuff
-CONSUMER_KEY = '4JpzPefAPpLFXbzDamI0et281'
-CONSUMER_SECRET = 'GKqPWT8e962QHG5AZ3oETTDJdJD4RG2mQHZ8Wq78VuEH2uidX5'
-OAUTH_TOKEN = '6895552-zHZvhNWEriddyvVMxWqJTbayNQi0dk6qbrz2862wjY'
-OAUTH_TOKEN_SECRET = 'AF8qAoktNPqCi0JtkS5zWVmHZZCTNLsCikIC1Fy4LnKQv'
+CONSUMER_KEY = ''
+CONSUMER_SECRET = ''
+OAUTH_TOKEN = ''
+OAUTH_TOKEN_SECRET = ''
 
 
 def get_authenticated_twitter():
@@ -22,12 +24,7 @@ def get_trends_for_region(twitter_api, region_id=1):
     results = []
     for response in responses:
         try:
-            results.append(
-                (response.get('url'),
-            response.get('query'),
-            response.get('name'),
-            response.get('promoted_content'))
-            )
+            results.append((response.get('url'), response.get('query'), response.get('name'), response.get('promoted_content')))
         except KeyError as ke:
             print("Couldn't read: "+ke.args[0])
             pass
@@ -41,6 +38,21 @@ def get_trend_names(trends):
         print(trend[2])
     return trendset
 
+
+def parse_config(config_file):
+    parser = configparser.ConfigParser()
+    parser.read(config_file)
+    return (parser['twitter']['consumer_key'],
+     parser['twitter']['consumer_secret'],
+     parser['twitter']['oauth_token'],
+     parser['twitter']['oauth_token_secret'])
+
+config = parse_config('mds.ini')
+
+CONSUMER_KEY = config[0]
+CONSUMER_SECRET = config[1]
+OAUTH_TOKEN = config[2]
+OAUTH_TOKEN_SECRET = config[3]
 
 twitter = get_authenticated_twitter()
 trends = get_trends_for_region(twitter)
